@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
-from fastapi import Header
+from fastapi import Depends, Request
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.errors import ApiError, ErrorCode
 
@@ -34,13 +35,18 @@ TOKENS = {
 _WWW_AUTH = {"WWW-Authenticate": "Bearer"}
 
 
+bearer_scheme = HTTPBearer(
+    auto_error=False,
+    description="Enter only the token: user-a-token, user-b-token or admin-token.",
+)
+
+
 def get_current_user(
-    authorization: str | None = Header(
-        default=None,
-        description="Bearer token: user-a-token, user-b-token or admin-token.",
-    ),
+    request: Request,
+    _credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
 ) -> User:
     """FastAPI dependency: answers *who is making the request?* or raises 401."""
+    authorization = request.headers.get("authorization")
     if authorization is None or not authorization.strip():
         raise ApiError(
             401,
