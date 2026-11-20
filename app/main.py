@@ -1,5 +1,7 @@
 import logging
 
+from app.routers import greeting
+
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 
@@ -18,7 +20,7 @@ app = FastAPI(
 )
 
 register_exception_handlers(app)
-
+app.include_router(greeting.router)
 
 @app.get("/", include_in_schema=False)
 async def root():

@@ -1,0 +1,1 @@
+"""AI Food Analyzer - API prototype with mocked data (Assignment 2)."""
