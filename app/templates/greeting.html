@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>$project_name API</title>
+  <style>
+    :root {
+      --bg: #f6f4ee;
+      --card: #ffffff;
+      --ink: #1f2a24;
+      --muted: #5d6b63;
+      --line: #e3e0d6;
+      --accent: #2f7d4f;
+      --accent-soft: #e4f2e9;
+      --get: #2463b5;
+      --post: #2f7d4f;
+      --put: #a86a00;
+      --delete: #b33a3a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+    }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 32px 20px 56px; }
+    header { padding: 8px 0 24px; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--accent); background: var(--accent-soft);
+      padding: 6px 12px; border-radius: 999px;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px #bfe3cc; }
+    h1 { font-size: clamp(2rem, 5vw, 2.8rem); line-height: 1.15; margin: 16px 0 8px; letter-spacing: -0.02em; }
+    .tagline { font-size: 1.15rem; color: var(--muted); margin: 0; }
+    section {
+      background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+      padding: 24px; margin-top: 20px;
+    }
+    h2 { font-size: 1.15rem; margin: 0 0 14px; }
+    p { margin: 0 0 12px; }
+    ul.plain { margin: 0; padding-left: 20px; }
+    ul.plain li { margin-bottom: 6px; }
+    .team { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .member { border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+    .member strong { display: block; font-size: 1.05rem; }
+    .member .sid { font-size: 0.85rem; color: var(--muted); font-family: ui-monospace, Menlo, Consolas, monospace; }
+    .member p { margin: 8px 0 0; font-size: 0.95rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+    tr:last-child td { border-bottom: none; }
+    code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.9rem; word-break: break-all; }
+    .method {
+      display: inline-block; min-width: 64px; text-align: center;
+      font: 700 0.75rem ui-monospace, Menlo, Consolas, monospace;
+      color: #fff; padding: 4px 8px; border-radius: 6px;
+    }
+    .GET { background: var(--get); } .POST { background: var(--post); }
+    .PUT { background: var(--put); } .DELETE { background: var(--delete); }
+    .auth { font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+    .status { display: flex; flex-wrap: wrap; gap: 12px 28px; }
+    .status div span { display: block; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+    .status div strong { font-size: 1.05rem; }
+    .ok { color: var(--accent); }
+    .tokens code { background: var(--bg); padding: 2px 6px; border-radius: 4px; white-space: nowrap; word-break: normal; }
+    footer { margin-top: 28px; color: var(--muted); font-size: 0.85rem; text-align: center; }
+
+    @media (max-width: 640px) {
+      .wrap { padding: 20px 14px 40px; }
+      section { padding: 18px; }
+      thead { display: none; }
+      table, tbody, tr, td { display: block; width: 100%; }
+      tr { border-bottom: 1px solid var(--line); padding: 10px 0; }
+      tr:last-child { border-bottom: none; }
+      td { border: none; padding: 3px 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <span class="eyebrow"><span class="dot"></span>API is running &middot; $version</span>
+      <h1>Welcome to $project_name</h1>
+      <p class="tagline">$tagline</p>
+    </header>
+
+    <section>
+      <h2>About the project</h2>
+      <p>$description</p>
+      <p><strong>Who it is for:</strong></p>
+      <ul class="plain">
+        $target_users
+      </ul>
+    </section>
+
+    <section>
+      <h2>Team &mdash; Group 5</h2>
+      <div class="team">
+        $team
+      </div>
+    </section>
+
+    <section>
+      <h2>Available endpoints</h2>
+      <table>
+        <thead><tr><th>Method</th><th>Path</th><th>Description</th><th>Access</th></tr></thead>
+        <tbody>
+          $endpoints
+        </tbody>
+      </table>
+      <p class="tokens" style="margin-top:16px">
+        Protected endpoints need <code>Authorization: Bearer &lt;token&gt;</code>.
+        Demo tokens: <code>user-a-token</code>, <code>user-b-token</code>, <code>admin-token</code>.
+        Interactive docs: <a href="/docs">/docs</a>.
+      </p>
+    </section>
+
+    <section>
+      <h2>Status</h2>
+      <div class="status">
+        <div><span>State</span><strong class="ok">Running</strong></div>
+        <div><span>Version</span><strong>$version</strong></div>
+        <div><span>Meals in store</span><strong>$meal_count</strong></div>
+        <div><span>Server time (UTC)</span><strong>$server_time</strong></div>
+      </div>
+      <p style="margin-top:14px;color:var(--muted);font-size:0.9rem">
+        Prototype with mocked in-memory data: all changes are lost when the server restarts.
+      </p>
+    </section>
+
+    <footer>CSCI 3509 &middot; Intro to Software Engineering &middot; ADA University &middot; Fall 2026</footer>
+  </div>
+</body>
+</html>
