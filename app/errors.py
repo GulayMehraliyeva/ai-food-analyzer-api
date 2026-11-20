@@ -58,15 +58,26 @@ def validation_error(details, message="The request contains invalid or missing f
     return ApiError(400, ErrorCode.VALIDATION_ERROR, message, details=details)
 
 
+# def _allowed_methods(request: Request):
+#     """Collect every method registered for the requested path (for the Allow header)."""
+#     methods = set()
+#     for route in request.app.routes:
+#         match, _ = route.matches(request.scope)
+#         if match in (Match.FULL, Match.PARTIAL) and getattr(route, "methods", None):
+#             methods.update(route.methods)
+#     methods.discard("HEAD")
+#     return sorted(methods)
 def _allowed_methods(request: Request):
-    """Collect every method registered for the requested path (for the Allow header)."""
-    methods = set()
-    for route in request.app.routes:
-        match, _ = route.matches(request.scope)
-        if match in (Match.FULL, Match.PARTIAL) and getattr(route, "methods", None):
-            methods.update(route.methods)
-    methods.discard("HEAD")
-    return sorted(methods)
+    candidates = (
+        "DELETE", "GET", "HEAD", "OPTIONS", "PATCH",
+        "POST", "PUT", "TRACE", "CONNECT",
+    )
+    allowed = []
+    for method in candidates:
+        scope = {**request.scope, "method": method}
+        if any(route.matches(scope)[0] == Match.FULL for route in request.app.routes):
+            allowed.append(method)
+    return sorted(allowed)
 
 
 def register_exception_handlers(app: FastAPI):
