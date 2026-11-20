@@ -38,7 +38,6 @@ def test_user_a_cannot_read_update_or_delete_user_b_meal(client, new_meal):
     assert client.get("/api/v1/meals/meal_103", headers=A).status_code == 404
     assert client.put("/api/v1/meals/meal_103", headers=A, json=new_meal).status_code == 404
     assert client.delete("/api/v1/meals/meal_103", headers=A).status_code == 404
-    # the meal is still there for its owner
     assert client.get("/api/v1/meals/meal_103", headers=B).status_code == 200
 
 
