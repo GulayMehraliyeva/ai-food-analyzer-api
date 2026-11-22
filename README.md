@@ -2,13 +2,14 @@
 
 **Group 5 · CSCI 3509 Intro to Software Engineering · ADA University · Fall 2026**
 
-First functional prototype of the AI Food Analyzer backend: a FastAPI REST API around the main resource meals (analyzed meal photos with ingredients and nutrition), using mocked in-memory data instead of PostgreSQL, mock bearer tokens with role-based access, structured validation/error responses, and an HTML greeting page.
+First functional prototype of the AI Food Analyzer backend: a FastAPI REST API around the main resource **meals** (analyzed meal photos with ingredients and nutrition). It uses mocked in-memory data instead of PostgreSQL, mock bearer tokens with role-based access, structured validation/error responses, and an HTML greeting page.
 
 | | |
 |---|---|
-| API documentation | [`docs/API.md`](docs/API.md)  |
+| API documentation | [`docs/API.md`](docs/API.md) |
 | Postman collection | [`postman/AI_Food_Analyzer.postman_collection.json`](postman/AI_Food_Analyzer.postman_collection.json) |
 | Greeting page | `http://localhost:8000/api/v1/greeting` |
+| Swagger UI | `http://localhost:8000/docs` |
 | Demo video | `<YouTube link>` |
 | Contributors | [`CONTRIBUTORS.md`](CONTRIBUTORS.md) |
 
@@ -39,19 +40,61 @@ uvicorn app.main:app --reload
 The API now runs at **http://localhost:8000**. Open:
 
 - http://localhost:8000/api/v1/greeting — HTML greeting page
-- http://localhost:8000/docs — interactive Swagger UI (click an endpoint → *Try it out*; put `Bearer user-a-token` in the `authorization` field)
+- http://localhost:8000/docs — interactive Swagger UI (see [Authentication](#authentication) for how to log in with a mock token)
 
-## Mock data and tokens
+## Authentication
 
-Data is stored in memory. Every create/update/delete is lost when the server restarts, and the server starts again with the seed data below. Restart the server to reset the demo.
+There is no real login or password storage. The API uses three predefined mock tokens, sent as a Bearer token on every request except `GET /api/v1/greeting` and `GET /api/v1/health`:
 
-| Token | User | Can do |
+```http
+Authorization: Bearer user-a-token
+```
+
+| Token | User (`ownerId`) | Role | Permissions |
+|---|---|---|---|
+| `user-a-token` | `user-a` | user | Read, create, update and delete **only their own** meals |
+| `user-b-token` | `user-b` | user | Read, create, update and delete **only their own** meals |
+| `admin-token` | `admin` | admin | Read, update and delete **all** meals; can create a meal for any user; can filter the list by `ownerId` |
+
+### Using a token in Swagger UI (`/docs`)
+
+Swagger UI uses an HTTP Bearer security scheme, so it adds the `Bearer ` prefix for you:
+
+1. Open http://localhost:8000/docs and click the green **Authorize** button (top right).
+2. In the *HTTPBearer* field enter **only the token**, for example `user-a-token` (do **not** type `Bearer `).
+3. Click **Authorize**, then **Close**. Every *Try it out* request now sends `Authorization: Bearer user-a-token`.
+4. To switch user, click **Authorize** again, choose **Logout**, and authorize with another token.
+
+With curl or Postman you must send the full header yourself: `Authorization: Bearer user-a-token`.
+
+### Authentication and authorization results
+
+| Situation | Status | `error.code` |
 |---|---|---|
-| `user-a-token` | `user-a` | only their own meals |
-| `user-b-token` | `user-b` | only their own meals |
-| `admin-token` | `admin` | all meals |
+| No `Authorization` header | `401` | `UNAUTHORIZED` |
+| Header is not in the form `Bearer <token>` | `401` | `INVALID_TOKEN` |
+| Unknown or invalid token | `401` | `INVALID_TOKEN` |
+| Regular user reads, updates or deletes another user's meal | `404` | `NOT_FOUND` |
+| Regular user creates a meal with another user's `ownerId` | `403` | `FORBIDDEN` |
+| Regular user lists meals with `?ownerId=` of another user | `403` | `FORBIDDEN` |
+| Administrator accesses any meal | `200` / `201` | — |
 
-Seed meals: `meal_101`, `meal_102` (user A); `meal_103`, `meal_104`, `meal_105` (user B, `meal_105` is an *unknown* meal).
+All `401` responses include the header `WWW-Authenticate: Bearer`.
+
+**Why `404` and not `403` for other users' meals:** meal history is private data. A `403` would confirm that the ID exists and belongs to someone else, which lets a user discover other people's meal IDs. A `404` is identical to the answer for an ID that does not exist, so nothing is revealed. We still use `403` where nothing hidden is exposed (creating a meal for another user, filtering the list by another user's `ownerId`). Details: [`docs/API.md`, section 8.1](docs/API.md#81-404-instead-of-403-for-other-users-meals).
+
+## Mock data
+
+Data is stored in memory. **Every create/update/delete is lost when the server restarts**, and the server starts again with the seed data below. Restart the server to reset the demo.
+
+| Meal | Owner | Notes |
+|---|---|---|
+| `meal_101`, `meal_102` | user A | |
+| `meal_103`, `meal_104` | user B | |
+| `meal_105` | user B | *unknown* meal (no ingredients recognised) |
+| `meal_999` | — | does **not** exist; use it to demonstrate `404 Not Found` |
+
+The administrator can see all five meals.
 
 ## Quick test with curl
 
@@ -64,11 +107,17 @@ curl -X POST http://localhost:8000/api/v1/meals \
   -H "Authorization: Bearer user-a-token" -H "Content-Type: application/json" \
   -d '{"title":"Chicken salad","mealType":"lunch","eatenAt":"2026-11-18T13:05:00Z","imagePath":"uploads/user-a/chicken-salad.jpg","ingredients":[{"name":"chicken breast","grams":120,"confidence":0.93},{"name":"lettuce","grams":60,"confidence":0.81}]}'
 
-# no token -> 401
+# no token -> 401 UNAUTHORIZED
 curl -i http://localhost:8000/api/v1/meals
+
+# invalid token -> 401 INVALID_TOKEN
+curl -i -H "Authorization: Bearer wrong-token" http://localhost:8000/api/v1/meals
 
 # user A reads user B's meal -> 404
 curl -i -H "Authorization: Bearer user-a-token" http://localhost:8000/api/v1/meals/meal_103
+
+# admin reads user B's meal -> 200
+curl -i -H "Authorization: Bearer admin-token" http://localhost:8000/api/v1/meals/meal_103
 ```
 
 (On Windows PowerShell use `curl.exe` and escape the inner quotes, or just use Postman.)
@@ -77,7 +126,7 @@ curl -i -H "Authorization: Bearer user-a-token" http://localhost:8000/api/v1/mea
 
 1. Postman → Import → choose `postman/AI_Food_Analyzer.postman_collection.json`.
 2. Start the server.
-3. Right-click the collection → Run collection → Run. All requests have tests that check the status code and error code (39 requests).
+3. Right-click the collection → Run collection → Run. All 39 requests have tests that check the status code and error code. Tokens are collection variables (`userAToken`, `userBToken`, `adminToken`).
 4. Restart the server before running the collection again (the run changes the mock data).
 
 ## Run the automated tests
@@ -93,7 +142,7 @@ pytest -q
 ```
 app/
   main.py            FastAPI app, routers, exception handlers
-  config.py          project info, team, endpoint list (edit student IDs here)
+  config.py          project info, team, endpoint list (shown on the greeting page)
   errors.py          response envelope, error codes, global error handlers
   auth.py            mock users + tokens, Bearer authentication, ownership check
   nutrition.py       mock nutrition table (stands in for USDA FoodData Central)
@@ -113,15 +162,12 @@ tests/               pytest suite
 
 | Member | Parts of the system |
 |---|---|
-| Gulay Mehraliyeva | Mock data and nutrition calculation, validation rules, meal CRUD endpoints, CRUD/validation tests, API documentation |
-| Araz Valishov | Project setup, response envelope and error handling, token authentication and role checks, HTML greeting page, health check, auth tests, Postman collection, README |
+| Gulay Mehraliyeva | Project config and `.gitignore`, JSON response envelope and error handlers (`app/errors.py`), FastAPI entry point (`app/main.py`), mock data and nutrition table (`app/nutrition.py`, `app/store.py`), mock users and Bearer token authentication including the Swagger Bearer scheme (`app/auth.py`), README |
+| Araz Valishov | Request and query validation (`app/validation.py`), meal CRUD endpoints (`app/routers/meals.py`), HTML greeting page, `405` `Allow` header handling, shared test fixtures (`tests/conftest.py`), validation tests, auth tests, other tests, health endpoint, Postman collection, API documentation (`docs/API.md`), |
 
 ## Git contribution summary
 
 Output of `git shortlog -sn --all`:
 
-```
-<paste the output here after all work is merged>
-```
 
-Workflow: every feature was developed on its own branch (`feature/...`) and merged into `main` through a pull request reviewed by the other member.
+Workflow: features were developed on their own branches (`feature/...`, `docs/...`) and merged into `main` through pull requests.
