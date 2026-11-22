@@ -45,6 +45,10 @@ Send a predefined mock token on every request except `/greeting` and `/health`:
 Authorization: Bearer user-a-token
 ```
 
+There is no login or password storage; the tokens below are fixed mock values.
+
+**In Swagger UI (`/docs`):** click **Authorize**, enter **only the token** (for example `user-a-token`, without the `Bearer ` prefix) and click **Authorize**. Swagger adds `Bearer ` itself and sends the header with every *Try it out* request. To switch user, click **Authorize** again, **Logout**, and enter another token. In curl or Postman, send the full `Authorization: Bearer <token>` header yourself.
+
 | User | `ownerId` | Token | Role | Permissions |
 |---|---|---|---|---|
 | Demo User A | `user-a` | `user-a-token` | user | Read, create, update and delete **only their own** meals |
@@ -120,7 +124,7 @@ Every JSON response uses one of two shapes. The HTTP status always matches: `2xx
 
 | Header | Required on | Value |
 |---|---|---|
-| `Authorization` | all `/meals` endpoints | `Bearer user-a-token` \| `Bearer user-b-token` \| `Bearer admin-token` |
+| `Authorization` | all `/meals` endpoints | `Bearer user-a-token` \| `Bearer user-b-token` \| `Bearer admin-token` (in Swagger's *Authorize* dialog enter only the token) |
 | `Content-Type` | `POST`, `PUT` | `application/json` |
 
 ---

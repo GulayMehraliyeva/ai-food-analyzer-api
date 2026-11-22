@@ -22,7 +22,7 @@ First functional prototype of the AI Food Analyzer backend: a FastAPI REST API a
 
 ```bash
 # 1. Clone
-git clone https://github.com/<org-or-user>/ai-food-analyzer-api.git
+git clone https://github.com/GulayMehraliyeva/ai-food-analyzer-api.git
 cd ai-food-analyzer-api
 
 # 2. Create and activate a virtual environment
@@ -163,7 +163,7 @@ tests/               pytest suite
 | Member | Parts of the system |
 |---|---|
 | Gulay Mehraliyeva | Project config and `.gitignore`, JSON response envelope and error handlers (`app/errors.py`), FastAPI entry point (`app/main.py`), mock data and nutrition table (`app/nutrition.py`, `app/store.py`), mock users and Bearer token authentication including the Swagger Bearer scheme (`app/auth.py`), README |
-| Araz Valishov | Request and query validation (`app/validation.py`), meal CRUD endpoints (`app/routers/meals.py`), HTML greeting page, `405` `Allow` header handling, shared test fixtures (`tests/conftest.py`), validation tests, auth tests, other tests, health endpoint, Postman collection, API documentation (`docs/API.md`), |
+| Araz Valishov | Request and query validation (`app/validation.py`), meal CRUD endpoints (`app/routers/meals.py`), HTML greeting page, `405` `Allow` header handling, shared test fixtures (`tests/conftest.py`), validation tests, auth tests, other tests, health endpoint, Postman collection, API documentation (`docs/API.md`) |
 
 ## Git contribution summary
 

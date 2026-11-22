@@ -9,7 +9,6 @@ def utc_now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
-# meal_999 is intentionally NOT in this list - use it to demonstrate 404 Not Found.
 _SEED = [
     {
         "id": "meal_101",
