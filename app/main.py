@@ -1,13 +1,11 @@
 import logging
 
-#from app.routers import greeting
-from app.routers import greeting, meals
-
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 
 from app.config import API_PREFIX, PROJECT_NAME
 from app.errors import register_exception_handlers
+from app.routers import greeting, health, meals
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
@@ -22,7 +20,9 @@ app = FastAPI(
 
 register_exception_handlers(app)
 app.include_router(greeting.router)
+app.include_router(health.router)
 app.include_router(meals.router)
+
 
 @app.get("/", include_in_schema=False)
 async def root():
