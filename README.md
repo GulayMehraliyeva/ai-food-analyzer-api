@@ -10,7 +10,7 @@ First functional prototype of the AI Food Analyzer backend: a FastAPI REST API a
 | Postman collection | [`postman/AI_Food_Analyzer.postman_collection.json`](postman/AI_Food_Analyzer.postman_collection.json) |
 | Greeting page | `http://localhost:8000/api/v1/greeting` |
 | Swagger UI | `http://localhost:8000/docs` |
-| Demo video | `<YouTube link>` |
+| Demo video | `https://youtu.be/KxfA1xAn1jc?si=9EPMJTFEFEH7r5gN` |
 | Contributors | [`CONTRIBUTORS.md`](CONTRIBUTORS.md) |
 
 ## Requirements
@@ -169,5 +169,11 @@ tests/               pytest suite
 
 Output of `git shortlog -sn --all`:
 
+    13  Gulay Mehraliyeva
+     5  Araz05
+     5  GulayMehraliyeva
+     4  arazvalishov
+
+GulayMehraliyeva and Gulay Mehraliyeva are the same person (GitHub account and local Git name); Araz05 and arazvalishov are Araz.
 
 Workflow: features were developed on their own branches (`feature/...`, `docs/...`) and merged into `main` through pull requests.
